@@ -1,3 +1,6 @@
+server:
+  port: 8089
+
 spring:
   application:
     name: payment
@@ -7,12 +10,30 @@ spring:
     driver-class-name: org.postgresql.Driver
     username: myuser
     password: mypassword
-    platform: postgresql
+
+  server:
+    port: 8089
+
+#    datasource:
+#      url: jdbc:postgresql://postgres-db:5432/mydatabase
+#      username: myuser
+#      password: mypassword
+#      driver-class-name: org.postgresql.Driver
+    jpa:
+      hibernate:
+        ddl-auto: update
+      show-sql: true
 
   jpa:
     show-sql: true
     hibernate:
       ddl-auto: update
 
-server:
-  port: 8089
+#eureka:
+#  client:
+#    service-url:
+#      defaultZone: http://localhost:8761/eureka/
+#    register-with-eureka: true
+#    fetch-registry: true
+#  instance:
+#    prefer-ip-address: true
