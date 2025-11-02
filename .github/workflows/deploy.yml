@@ -1,0 +1,45 @@
+name: CI/CD to Portainer
+
+on:
+  push:
+    branches: [ "main" ]  # Runs every time you push to main branch
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Build Spring Boot jar
+        run: mvn clean package -DskipTests
+
+      - name: Build Docker image
+        run: docker build -t payment-app:latest .
+
+      - name: Login to Portainer via API
+        run: |
+          echo "Authenticating with Portainer..."
+          curl -X POST "$PORTAINER_URL/webhooks?key=$PORTAINER_TOKEN"
+
+      - name: Deploy container through Portainer API
+        run: |
+          echo "Redeploying container..."
+          curl -X POST \
+            -H "Authorization: Bearer $PORTAINER_TOKEN" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "image": "payment-app:latest",
+              "restartPolicy": "always"
+            }' \
+            "$PORTAINER_URL/endpoints/1/docker/containers/payment/redeploy"
+        env:
+          PORTAINER_URL: ${{ secrets.PORTAINER_URL }}
+          PORTAINER_TOKEN: ${{ secrets.PORTAINER_TOKEN }}
