@@ -2,7 +2,7 @@ name: CI/CD to Portainer
 
 on:
   push:
-    branches: [ "main" ]  # Runs every time you push to main branch
+    branches: [ "main" ]
 
 jobs:
   build-and-deploy:
@@ -24,22 +24,12 @@ jobs:
       - name: Build Docker image
         run: docker build -t payment-app:latest .
 
-      - name: Login to Portainer via API
-        run: |
-          echo "Authenticating with Portainer..."
-          curl -X POST "$PORTAINER_URL/webhooks?key=$PORTAINER_TOKEN"
-
-      - name: Deploy container through Portainer API
-        run: |
-          echo "Redeploying container..."
-          curl -X POST \
-            -H "Authorization: Bearer $PORTAINER_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "image": "payment-app:latest",
-              "restartPolicy": "always"
-            }' \
-            "$PORTAINER_URL/endpoints/1/docker/containers/payment/redeploy"
+      - name: Redeploy container in Portainer
         env:
           PORTAINER_URL: ${{ secrets.PORTAINER_URL }}
           PORTAINER_TOKEN: ${{ secrets.PORTAINER_TOKEN }}
+        run: |
+          echo "Redeploying payment container in Portainer..."
+          curl -X POST \
+            -H "Authorization: Bearer $PORTAINER_TOKEN" \
+            "$PORTAINER_URL/endpoints/1/docker/containers/payment/redeploy"
