@@ -42,9 +42,7 @@ jobs:
 
       # Step 6: Push image to Docker Hub
       - name: Push image
-        run: |
-          docker tag ${{ github.repository }}:latest ${{ secrets.DOCKERHUB_USERNAME }}/payment-service:latest
-          docker push ${{ secrets.DOCKERHUB_USERNAME }}/payment-service:latest
+        run: docker push ${{ secrets.DOCKERHUB_USERNAME }}/payment-service:latest
 
       # Step 7: (Optional) Deploy on remote server
       # You can skip this part for now if running locally.
